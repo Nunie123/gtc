@@ -1,28 +1,69 @@
-.App {
+html, body {
+  font-size: 16px;
+  min-width: 810px;
+  padding: 15px;
+  height:100%;
+}
+
+header {
+  min-height: 50px;
+  height: 6%;
+  padding: 0px;
+  margin: 0px;
+  color: #8d9b84;
+  border-bottom: 1px lightgray solid;
+  align-items: baseline;
+}
+
+#root{
+  height:100%;
+}
+
+.app {
+  height: 100%;
+}
+
+.container{
+  display: flex;
+}
+
+.logo {
+  font-size: 3em;
+  margin: 0px;
+}
+
+.tagline {
+  margin-left: 20px;
+}
+
+.calendar{
+  margin-top: 15px;
+  width:100%;
+  height: 89%;
+  border-collapse: collapse;
+
+}
+
+.display-month {
+  text-align: center;
+  font-size: 3em;
+  margin: 0px 20px;
+}
+
+.date-controls {
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.month-day-box{
+border:1px solid lightgrey;
+margin: 0px;
+width: 14.285%;
+
+vertical-align: top;
+padding: 5px;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.cal-header{
+  height: 20px;
+  text-align: center;
 }
