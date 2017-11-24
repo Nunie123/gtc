@@ -5,24 +5,30 @@ import './App.css';
 class App extends Component {
   constructor(props) {
     super(props)
+    this.changeMonth = this.changeMonth.bind(this)
     this.state = {
-      year: new Date().getFullYear(),
-      month: new Date().getMonth(),     //January is 0
-      day: new Date().getDate()
+      date: new Date()
     }
   }
 
+  changeMonth(direction){
+    let curDate = new Date(this.state.date.getFullYear(), this.state.date.getMonth(), 1)
+    if(direction === "backwards"){this.setState({date: new Date(curDate.setMonth(curDate.getMonth()-1))})}
+    if(direction === "forwards"){this.setState({date: new Date(curDate.setMonth(curDate.getMonth()+1))})}
+  }
+
   render() {
-    const year = this.state.year
-    const month = this.state.month
-    const day = this.state.day
+    const year = this.state.date.getFullYear()
+    const month = this.state.date.getMonth()
+    const day = this.state.date.getDate()
     return (
       <div className="app">
         {banner}
         <DisplayMonth
           monthName={getMonthName(new Date(year, month, day))}
           year={year}
-          month={month}/>
+          month={month}
+          changeMonth={this.changeMonth}/>
         <Calendar calendarHeader = {calendarHeader}
           year = {year}
           month = {month}
@@ -76,16 +82,15 @@ class DisplayMonth extends Component {
   }
 
   changeMonth(e){
-    console.log(e.target.value)
-    this.props.changeMonth(this.props.month,)
+    this.props.changeMonth(e.target.value)
   }
 
   render() {
     return (
       <div className="date-controls">
         <span><button onClick={this.changeMonth} value="backwards">previous</button></span>
-        <span className="display-month">{this.props.month}, {this.props.year}</span>
-        <span><button >next</button></span>
+        <span className="display-month">{this.props.monthName}, {this.props.year}</span>
+        <span><button onClick={this.changeMonth} value="forwards">next</button></span>
       </div>
     )
   }
