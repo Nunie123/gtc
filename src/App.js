@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from 'react'
+import './App.css'
+import fetch from 'isomorphic-fetch'
 // import '../node_modules/flexboxgrid/css/flexboxgrid.min.css'
 
 class App extends Component {
@@ -7,8 +8,16 @@ class App extends Component {
     super(props)
     this.changeMonth = this.changeMonth.bind(this)
     this.state = {
-      date: new Date()
+      date: new Date(),
+      events: []
     }
+  }
+
+  componentDidMount(){
+    fetch("http://nunes.online/api/gtc")
+      .then(response => response.json())
+      .then(events => events.map(event=>({...event, time: new Date(event.time)})))
+      .then(events => this.setState({events}))
   }
 
   changeMonth(direction){
@@ -32,9 +41,9 @@ class App extends Component {
         <Calendar calendarHeader = {calendarHeader}
           year = {year}
           month = {month}
-          dateMatrix = {getMonthDates(year, month)}/>
+          dateMatrix = {getMonthDates(year, month)}
+          events = {this.state.events}/>
       </div>
-
     )
   }
 }
@@ -87,25 +96,31 @@ class DisplayMonth extends Component {
 
   render() {
     return (
-      <div className="date-controls">
-        <span><button onClick={this.changeMonth} value="backwards">previous</button></span>
-        <span className="display-month">{this.props.monthName}, {this.props.year}</span>
-        <span><button onClick={this.changeMonth} value="forwards">next</button></span>
+      <div className="date-controls container">
+        <button onClick={this.changeMonth} value="backwards">previous</button>
+        <div className="display-month">{this.props.monthName}, {this.props.year}</div>
+        <button onClick={this.changeMonth} value="forwards">next</button>
       </div>
     )
   }
 }
 
 function Calendar(props){
+  const firstDay = new Date(props.dateMatrix[0][0])
+  const lastDay = new Date(props.dateMatrix[5][6])    //this assumes the array will be 6x7
+  const dayBefore = new Date(new Date(firstDay).setDate(firstDay.getDate()-1))    //nested new Date is needed to ensure setDate works on a copy, not a reference
+  const dayAfter = new Date(new Date(lastDay).setDate(lastDay.getDate()+1))       //outer new Date converts unix timestamp to Date object
+  const filteredEvents = props.events.filter(event => event.time>dayBefore && event.time<dayAfter)
+
   return (
     <table className="calendar">
       {props.calendarHeader}
-      <MonthWeek weekDates={props.dateMatrix[0]}/>
-      <MonthWeek weekDates={props.dateMatrix[1]}/>
-      <MonthWeek weekDates={props.dateMatrix[2]}/>
-      <MonthWeek weekDates={props.dateMatrix[3]}/>
-      <MonthWeek weekDates={props.dateMatrix[4]}/>
-      <MonthWeek weekDates={props.dateMatrix[5]}/>
+      <MonthWeek weekDates={props.dateMatrix[0]} events={filteredEvents}/>
+      <MonthWeek weekDates={props.dateMatrix[1]} events={filteredEvents}/>
+      <MonthWeek weekDates={props.dateMatrix[2]} events={filteredEvents}/>
+      <MonthWeek weekDates={props.dateMatrix[3]} events={filteredEvents}/>
+      <MonthWeek weekDates={props.dateMatrix[4]} events={filteredEvents}/>
+      <MonthWeek weekDates={props.dateMatrix[5]} events={filteredEvents}/>
     </table>
   )
 }
@@ -113,21 +128,40 @@ function Calendar(props){
 function MonthWeek(props){
   return (
     <tr className="month-row">
-      <MonthDay date={props.weekDates[0]}/>
-      <MonthDay date={props.weekDates[1]}/>
-      <MonthDay date={props.weekDates[2]}/>
-      <MonthDay date={props.weekDates[3]}/>
-      <MonthDay date={props.weekDates[4]}/>
-      <MonthDay date={props.weekDates[5]}/>
-      <MonthDay date={props.weekDates[6]}/>
+      <MonthDay date={props.weekDates[0]} events={props.events}/>
+      <MonthDay date={props.weekDates[1]} events={props.events}/>
+      <MonthDay date={props.weekDates[2]} events={props.events}/>
+      <MonthDay date={props.weekDates[3]} events={props.events}/>
+      <MonthDay date={props.weekDates[4]} events={props.events}/>
+      <MonthDay date={props.weekDates[5]} events={props.events}/>
+      <MonthDay date={props.weekDates[6]} events={props.events}/>
     </tr>
   )
 }
 
 function MonthDay(props){
+  const today = props.date
+  const eventsArray = props.events.filter(function(event){
+    return (today.getFullYear() === event.time.getFullYear()
+    && today.getMonth() === event.time.getMonth()
+    && today.getDate() === event.time.getDate())
+  })
+
   return (
     <td className="month-day-box">
-      {props.date.getDate()}
+      <div>{today.getDate()}</div>
+      <div className="inner-box">
+        {eventsArray.map((event, index)=>(
+          <div className="event" key={index}>
+            {event.time.toLocaleTimeString('en-US', {hour:"2-digit", minute:"numeric"})
+              .replace(" ","")
+              .replace(":00","")
+              .replace("PM","pm")
+              .replace("AM","am")}
+            <span className="name"> {event.group_name}</span>
+          </div>
+        ))}
+      </div>
     </td>
   )
 }

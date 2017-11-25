@@ -1,8 +1,9 @@
 html, body {
   font-size: 16px;
-  min-width: 810px;
+  min-width: 610px;
   padding: 15px;
   height:100%;
+  font-family: 'Roboto', sans-serif;
 }
 
 header {
@@ -10,7 +11,7 @@ header {
   height: 6%;
   padding: 0px;
   margin: 0px;
-  color: #8d9b84;
+  color: #00695C;
   border-bottom: 1px lightgray solid;
   align-items: baseline;
 }
@@ -48,22 +49,48 @@ header {
   text-align: center;
   font-size: 3em;
   margin: 0px 20px;
+  width: 370px;
 }
 
 .date-controls {
-  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-row{
+  /*height: 16.666%;*/
 }
 
 .month-day-box{
 border:1px solid lightgrey;
 margin: 0px;
 width: 14.285%;
-
+/*height: 16.666%;*/
 vertical-align: top;
 padding: 5px;
+}
+
+.month-day-box .inner-box {
+  height: 90%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.event .name {
+  /*font-weight: bold;*/
+  font-size: 1.2em;
 }
 
 .cal-header{
   height: 20px;
   text-align: center;
+}
+
+.event{
+  font-size: 0.6em;
+  margin: 2px 1px;
+  padding: 3px 4px;
+  background-color: #009688;
+  color: white;
+  border-radius: 3px;
 }
