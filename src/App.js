@@ -7,9 +7,13 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.changeMonth = this.changeMonth.bind(this)
+    this.viewEvent = this.viewEvent.bind(this)
+    this.hideEvent = this.hideEvent.bind(this)
     this.state = {
       date: new Date(),
-      events: []
+      allEvents: [],
+      eventView: false,
+      eventDetails: {}
     }
   }
 
@@ -17,7 +21,7 @@ class App extends Component {
     fetch("http://nunes.online/api/gtc")
       .then(response => response.json())
       .then(events => events.map(event=>({...event, time: new Date(event.time)})))
-      .then(events => this.setState({events}))
+      .then(allEvents => this.setState({allEvents}))
   }
 
   changeMonth(direction){
@@ -26,23 +30,38 @@ class App extends Component {
     if(direction === "forwards"){this.setState({date: new Date(curDate.setMonth(curDate.getMonth()+1))})}
   }
 
-  render() {
+  viewEvent(eventDetails){
+    this.setState({eventView:true, eventDetails})
+  }
+
+  hideEvent(){
+    this.setState({eventView:false, eventDetails:{}})
+  }
+
+  render(){
     const year = this.state.date.getFullYear()
     const month = this.state.date.getMonth()
     const day = this.state.date.getDate()
+    const dateMatrix = getMonthDates(year, month)
+    const firstDay = dateMatrix[0][0]
+    const lastDay = dateMatrix[5][6]   //this assumes the array will be 6x7
+    const dayBefore = new Date(new Date(firstDay).setDate(firstDay.getDate()-1))    //nested new Date is needed to ensure setDate works on a copy, not a reference
+    const dayAfter = new Date(new Date(lastDay).setDate(lastDay.getDate()+1))   //outer new Date converts unix timestamp to Date object
+    const events = this.state.allEvents.filter(event => event.time>dayBefore && event.time<dayAfter)
+    const eventView = this.state.eventView ? <EventView eventDetails={this.state.eventDetails} hideEvent={this.hideEvent}/> : ""
+
     return (
       <div className="app">
         {banner}
         <DisplayMonth
           monthName={getMonthName(new Date(year, month, day))}
           year={year}
-          month={month}
           changeMonth={this.changeMonth}/>
         <Calendar calendarHeader = {calendarHeader}
-          year = {year}
-          month = {month}
-          dateMatrix = {getMonthDates(year, month)}
-          events = {this.state.events}/>
+          dateMatrix = {dateMatrix}
+          events = {events}
+          viewEvent = {this.viewEvent}/>
+        {eventView}
       </div>
     )
   }
@@ -73,97 +92,216 @@ const banner = (
 )
 
 const calendarHeader = (
-  <tr className="cal-header">
-    <td>Sunday</td>
-    <td>Monday</td>
-    <td>Tuesday</td>
-    <td>Wednesday</td>
-    <td>Thursday</td>
-    <td>Friday</td>
-    <td>Saturday</td>
-  </tr>
+    <tr className="cal-header">
+      <td>Sunday</td>
+      <td>Monday</td>
+      <td>Tuesday</td>
+      <td>Wednesday</td>
+      <td>Thursday</td>
+      <td>Friday</td>
+      <td>Saturday</td>
+    </tr>
 )
 
-class DisplayMonth extends Component {
-  constructor(props) {
+class EventView extends Component {
+  constructor(props){
     super(props)
-    this.changeMonth = this.changeMonth.bind(this)
+    this.hideEvent = this.hideEvent.bind(this)
+    this.state = {
+      eventDetails: props.eventDetails,
+      hideEvent: props.hideEvent
+    }
   }
 
-  changeMonth(e){
-    this.props.changeMonth(e.target.value)
+  componentWillReceiveProps(nextProps) {
+    this.setState({ eventDetails: nextProps.eventDetails });
   }
 
-  render() {
-    return (
-      <div className="date-controls container">
-        <button onClick={this.changeMonth} value="backwards">previous</button>
-        <div className="display-month">{this.props.monthName}, {this.props.year}</div>
-        <button onClick={this.changeMonth} value="forwards">next</button>
+  hideEvent(){
+    this.state.hideEvent()
+  }
+
+  render(){
+    const eventDetails = this.state.eventDetails
+    const eventName = eventDetails.event_name
+    const groupName = eventDetails.group_name
+    const eventDate = eventDetails.time.toLocaleString("en-us", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
+    const eventTime = eventDetails.time.toLocaleTimeString('en-US', {hour:"2-digit", minute:"numeric"}).replace(" ","").replace(":00","").replace("PM","pm").replace("AM","am")
+    const eventUrl = eventDetails.url
+    const eventDescription = eventDetails.description.replace(/^<(.|\n)*?>/ig, "").replace(/<(.|\n)*?>/ig, "\n").replace(/&amp;/ig, "&").replace(/\n\n/ig,"\n")
+    if(eventDetails.venue){
+      const eventVenueName = eventDetails.venue.name || ''
+      const eventAddress = eventDetails.venue.address || ''
+      const eventCity = eventDetails.venue.city || 'Greenville'
+      const eventState = eventDetails.venue.state || 'SC'
+      const eventZip = eventDetails.venue.zip || ''
+      var venue =
+`${eventVenueName}
+${eventAddress}
+${eventCity}, ${eventState} ${eventZip}`
+    }
+
+
+    console.log(this.state.eventDetails)
+    return(
+      <div className="modal">
+        <div className="event-view">
+          <span className="event-view-close" onClick={this.hideEvent}>&times;</span>
+          <div className="event-name detail">{eventName}</div>
+          <div className="group-name detail container"><div className="label">Hosted by: </div>{groupName}</div>
+          <div className="event-date detail container"><div className="label">Hapening on: </div>{eventDate} at {eventTime}</div>
+          <div className="venue detail container">
+            <div className="label">Located at: </div>
+
+            <div>{venue}</div>
+          </div>
+          <div className="description detail container"><div className="label">Description: </div><div>{eventDescription}</div></div>
+          <div className="event-url detail container"><div className="label">More info at: </div><a href={eventUrl}>{eventUrl}</a></div>
+        </div>
       </div>
     )
   }
 }
 
-function Calendar(props){
-  const firstDay = new Date(props.dateMatrix[0][0])
-  const lastDay = new Date(props.dateMatrix[5][6])    //this assumes the array will be 6x7
-  const dayBefore = new Date(new Date(firstDay).setDate(firstDay.getDate()-1))    //nested new Date is needed to ensure setDate works on a copy, not a reference
-  const dayAfter = new Date(new Date(lastDay).setDate(lastDay.getDate()+1))       //outer new Date converts unix timestamp to Date object
-  const filteredEvents = props.events.filter(event => event.time>dayBefore && event.time<dayAfter)
+class DisplayMonth extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      monthName: props.monthName,
+      year: props.year,
+      changeMonth: props.changeMonth
+    }
+    this.updateState = this.updateState.bind(this)
+  }
 
-  return (
-    <table className="calendar">
-      {props.calendarHeader}
-      <MonthWeek weekDates={props.dateMatrix[0]} events={filteredEvents}/>
-      <MonthWeek weekDates={props.dateMatrix[1]} events={filteredEvents}/>
-      <MonthWeek weekDates={props.dateMatrix[2]} events={filteredEvents}/>
-      <MonthWeek weekDates={props.dateMatrix[3]} events={filteredEvents}/>
-      <MonthWeek weekDates={props.dateMatrix[4]} events={filteredEvents}/>
-      <MonthWeek weekDates={props.dateMatrix[5]} events={filteredEvents}/>
-    </table>
-  )
-}
+  updateState(e){
+    this.state.changeMonth(e.target.value)
+  }
 
-function MonthWeek(props){
-  return (
-    <tr className="month-row">
-      <MonthDay date={props.weekDates[0]} events={props.events}/>
-      <MonthDay date={props.weekDates[1]} events={props.events}/>
-      <MonthDay date={props.weekDates[2]} events={props.events}/>
-      <MonthDay date={props.weekDates[3]} events={props.events}/>
-      <MonthDay date={props.weekDates[4]} events={props.events}/>
-      <MonthDay date={props.weekDates[5]} events={props.events}/>
-      <MonthDay date={props.weekDates[6]} events={props.events}/>
-    </tr>
-  )
-}
+  componentWillReceiveProps(nextProps) {
+    this.setState({ monthName: nextProps.monthName, year: nextProps.year });
+  }
 
-function MonthDay(props){
-  const today = props.date
-  const eventsArray = props.events.filter(function(event){
-    return (today.getFullYear() === event.time.getFullYear()
-    && today.getMonth() === event.time.getMonth()
-    && today.getDate() === event.time.getDate())
-  })
-
-  return (
-    <td className="month-day-box">
-      <div>{today.getDate()}</div>
-      <div className="inner-box">
-        {eventsArray.map((event, index)=>(
-          <div className="event" key={index}>
-            {event.time.toLocaleTimeString('en-US', {hour:"2-digit", minute:"numeric"})
-              .replace(" ","")
-              .replace(":00","")
-              .replace("PM","pm")
-              .replace("AM","am")}
-            <span className="name"> {event.group_name}</span>
-          </div>
-        ))}
+  render() {
+    return (
+      <div className="date-controls container">
+        <button onClick={this.updateState} value="backwards">previous</button>
+        <div className="display-month">{this.state.monthName}, {this.state.year}</div>
+        <button onClick={this.updateState} value="forwards">next</button>
       </div>
-    </td>
-  )
+    )
+  }
+}
+
+class Calendar extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      dateMatrix: props.dateMatrix,
+      events: props.events,
+      calendarHeader: props.calendarHeader,
+      viewEvent: props.viewEvent
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ events: nextProps.events, dateMatrix: nextProps.dateMatrix });
+  }
+
+  render(){
+    //console.log(this.state.events)
+    return (
+      <table className="calendar">
+        <tbody>
+          {this.state.calendarHeader}
+          <MonthWeek weekDates={this.state.dateMatrix[0]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+          <MonthWeek weekDates={this.state.dateMatrix[1]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+          <MonthWeek weekDates={this.state.dateMatrix[2]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+          <MonthWeek weekDates={this.state.dateMatrix[3]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+          <MonthWeek weekDates={this.state.dateMatrix[4]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+          <MonthWeek weekDates={this.state.dateMatrix[5]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        </tbody>
+      </table>
+    )
+  }
+}
+
+class MonthWeek extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      weekDates: props.weekDates,
+      events: props.events,
+      viewEvent: props.viewEvent
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ events: nextProps.events, weekDates: nextProps.weekDates });
+  }
+
+  render(){
+    //console.log(this.state)
+    return (
+      <tr className="month-row">
+        <MonthDay date={this.state.weekDates[0]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        <MonthDay date={this.state.weekDates[1]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        <MonthDay date={this.state.weekDates[2]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        <MonthDay date={this.state.weekDates[3]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        <MonthDay date={this.state.weekDates[4]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        <MonthDay date={this.state.weekDates[5]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+        <MonthDay date={this.state.weekDates[6]} events={this.state.events} viewEvent={this.state.viewEvent}/>
+      </tr>)
+  }
+}
+
+class MonthDay extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      date: props.date,
+      events: props.events,
+      viewEvent: props.viewEvent
+    }
+    this.getTodaysEvents = this.getTodaysEvents.bind(this)
+    this.displayTime = this.displayTime.bind(this)
+    this.viewEvent = this.viewEvent.bind(this)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ events: nextProps.events, date: nextProps.date });
+  }
+
+  getTodaysEvents = function(events, date){
+    return (events.filter(function (event) {
+      return date.getFullYear() === event.time.getFullYear() && date.getMonth() === event.time.getMonth() && date.getDate() === event.time.getDate()
+    }))
+  }
+
+  displayTime = date => date.toLocaleTimeString('en-US', {hour:"2-digit", minute:"numeric"}).replace(" ","").replace(":00","").replace("PM","pm").replace("AM","am")
+
+  viewEvent = (event) => {
+    this.state.viewEvent(event)
+    //console.log(event)
+  }
+
+  render(){
+    const todaysEvents = this.getTodaysEvents(this.state.events, this.state.date) || []
+    return (
+      <td className="month-day-box">
+        <div>{this.props.date.getDate()}</div>
+        <div className="inner-box">
+          {todaysEvents.map((event, index)=>(
+            <button className="event" key={index} onClick={this.viewEvent.bind(this, event)}>
+              {this.displayTime(event.time)}
+              <span className="name"> {event.group_name}</span>
+            </button>
+          ))}
+        </div>
+      </td>
+    )
+  }
+
 }
 
 
