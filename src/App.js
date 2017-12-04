@@ -304,15 +304,17 @@ class MonthDay extends Component {
     return (
       <td className="month-day-box">
         <div className="date-number">{this.props.date.getDate()}</div>
-        <div className="inner-box">
-          {todaysEvents.map((event, index)=>(
-            <div className="event-button-wrapper">
-              <button className="event" style={{backgroundColor: event.color}} key={index} onClick={this.viewEvent.bind(this, event)}>
-                {this.displayTime(event.time)}
-                <span className="name"> {event.group_name}</span>
-              </button>
-            </div>
-          ))}
+        <div className="inner-box-wrapper">
+          <div className="inner-box">
+            {todaysEvents.map((event, index)=>(
+              <div className="event-button-wrapper">
+                <button className="event" style={{backgroundColor: event.color}} key={index} onClick={this.viewEvent.bind(this, event)}>
+                  {this.displayTime(event.time)}
+                  <span className="name"> {event.group_name}</span>
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </td>
     )

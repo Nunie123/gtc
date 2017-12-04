@@ -106,15 +106,27 @@ vertical-align: top;
 padding: 5px;
 }
 
-.month-day-box .inner-box {
+.month-day-box .inner-box-wrapper {
   height: 85%;
   width: 100%;
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding-right: 50%;
+  /*margin-right: -100px;*/
+
+}
+
+.month-day-box .inner-box{
+  height: 100%;
+  width: 100%;
+  /*overflow-y: scroll;*/
+  /*overflow-x: visible;*/
 }
 
 .month-day-box .event-button-wrapper {
   width: 100%;
   white-space: nowrap;
+
 }
 
 .month-day-box:last-child,
@@ -134,30 +146,43 @@ padding: 5px;
 
 .month-day-box button.event{
   font-size: 0.6em;
-  margin: 2px 1px;
+  margin: 0px 0px;
   padding: 5px 6px;
   background-color: #009688;
   color: white;
-  border-radius: 10px;
-  width: 98%;
+  border-radius: 15px;
+  width: 100%;
   text-align: left;
   overflow-x: hidden;
   text-overflow: ellipsis;
   font-weight: 300;
+  z-index: 1;
+  position: relative;
+  border: 3px solid #ededed;
 }
 .month-day-box button.event:focus{
   outline:none;
 }
 .month-day-box button.event:hover{
-  border: 1px solid gray;
+  /*border-right: 6px solid white;*/
   background-color: #00897B;
   cursor: pointer;
+  overflow-x: hidden;
+  width: auto;
+  max-width: 150%;
+  text-overflow: ellipsis;
+  min-width: 100%;
+  z-index: 2;
+  color: #ededed;
+  /*border-radius: 15px;
+  margin: 0px 0px;
+  padding: 5px 6px;*/
 }
 
 /*Event View componant-----------------------------------------------------*/
 .modal {
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 3; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
