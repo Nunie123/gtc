@@ -18,9 +18,22 @@ class App extends Component {
   }
 
   componentDidMount(){
+    const colors = ['#F44336', '#673AB7', '#03A9F4', '#4CAF50', '#FF5722', '#E91E63', '#3F51B5', '#00BCD4', '#8BC34A', '#FFC107', '#9C27B0', '#2196F3', '#009688', '#C0CA33', '#FF9800']
+    const colorArray = colors.concat(colors).concat(colors).concat(colors)
     fetch("https://nunes.online/api/gtc")
       .then(response => response.json())
       .then(events => events.map(event=>({...event, time: new Date(event.time)})))
+      .then(events => {
+        const allGroups = events.map(event=>event.group_name)
+        const uniqueGroups = allGroups.filter((v,i,a)=>a.indexOf(v)===i)
+        const colorGroupsArray = uniqueGroups.map((group, index)=>({'group':group, 'color':colorArray[index]}))
+        const colorGroupsObject = colorGroupsArray.reduce((obj, cur)=>{
+          obj[cur.group]=cur.color
+          return obj
+        },{})
+        const colorEvents = events.map(event=>({...event, 'color':colorGroupsObject[event.group_name]}))
+        return colorEvents
+      })
       .then(allEvents => this.setState({allEvents}))
   }
 
@@ -294,7 +307,7 @@ class MonthDay extends Component {
         <div className="inner-box">
           {todaysEvents.map((event, index)=>(
             <div className="event-button-wrapper">
-              <button className="event" key={index} onClick={this.viewEvent.bind(this, event)}>
+              <button className="event" style={{backgroundColor: event.color}} key={index} onClick={this.viewEvent.bind(this, event)}>
                 {this.displayTime(event.time)}
                 <span className="name"> {event.group_name}</span>
               </button>
