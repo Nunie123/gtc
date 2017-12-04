@@ -18,7 +18,7 @@ class App extends Component {
   }
 
   componentDidMount(){
-    const colors = ['#F44336', '#673AB7', '#03A9F4', '#4CAF50', '#FF5722', '#E91E63', '#3F51B5', '#00BCD4', '#8BC34A', '#FFC107', '#9C27B0', '#2196F3', '#009688', '#C0CA33', '#FF9800']
+    const colors = ['#880E4F', '#F44336', '#673AB7', '#03A9F4', '#4CAF50', '#FF5722', '#E91E63', '#3F51B5', '#00BCD4', '#8BC34A', '#FFC107', '#9C27B0', '#2196F3', '#009688', '#C0CA33', '#FF9800']
     const colorArray = colors.concat(colors).concat(colors).concat(colors)
     fetch("https://nunes.online/api/gtc")
       .then(response => response.json())
