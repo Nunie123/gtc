@@ -1,19 +1,10 @@
 html, body {
-  font-size: 16px;
-  min-width: 610px;
+  font-size: 18px;
+  min-width: 800px;
   padding: 15px;
   height:95%;
-  font-family: 'Roboto', sans-serif;
-}
-
-header {
-  min-height: 50px;
-  height: 6%;
-  padding: 0px;
-  margin: 0px;
-  color: #00695C;
-  border-bottom: 1px lightgray solid;
-  align-items: baseline;
+  font-family: 'Lato', sans-serif;
+  font-weight: 200;
 }
 
 #root{
@@ -24,18 +15,72 @@ header {
   height: 100%;
 }
 
-.container{
-  display: flex;
-}
-
+/*Display Month Componant---------------------------------------------*/
 .logo {
-  font-size: 3em;
+  font-size: 1.5em;
   margin: 0px;
+  grid-row: auto;
+  justify-self: center;
+  align-self: center;
 }
 
-.tagline {
-  margin-left: 20px;
+.logo-wrapper {
+  display: grid;
 }
+
+header.header-wrapper{
+  display: grid;
+  grid-template-columns: 15% 70% 15%;
+  color: #262626;
+  padding-bottom: 15px;
+}
+
+header .month-wrapper {
+  justify-self: center;
+  align-self: center;
+  display: grid;
+  grid-template-columns: 50px 450px 50px;
+}
+
+header .month-wrapper .left{
+  justify-self: end;
+  align-self: end;
+  padding: 10px;
+}
+
+header .month-wrapper .right{
+  justify-self: start;
+  align-self: end;
+  padding: 10px;
+}
+
+.display-month {
+  font-size: 4.5em;
+  justify-self: center;
+  align-self: center;
+}
+
+header .month-wrapper .change-month-btn {
+  font-size: 3em;
+  font-weight: 300;
+  border: none;
+  cursor: pointer;
+}
+
+.display-year {
+  font-size: 2.5em;
+  justify-self: center;
+  align-self: center;
+}
+
+
+
+.change-month-btn:focus {
+  outline: none;
+}
+
+
+/*Calendar componant-------------------------------------------------*/
 
 .calendar{
   margin-top: 15px;
@@ -45,27 +90,17 @@ header {
 
 }
 
-.display-month {
+.cal-header{
+  height: 20px;
   text-align: center;
-  font-size: 3em;
-  margin: 0px 20px;
-  width: 370px;
+  font-weight: 400;
 }
 
-.date-controls {
-  align-items: center;
-  justify-content: center;
-}
-
-.month-row{
-  /*height: 16.666%;*/
-}
-
+/*Month-day Componant---------------------------------------------------*/
 .month-day-box{
 border:1px solid lightgrey;
 margin: 0px;
 width: 14.285%;
-/*height: 16.666%;*/
 vertical-align: top;
 padding: 5px;
 }
@@ -73,20 +108,30 @@ padding: 5px;
 .month-day-box .inner-box {
   height: 85%;
   width: 100%;
-  overflow-y: auto;
+  overflow: scroll;
 }
 
-.cal-header{
-  height: 20px;
-  text-align: center;
+.month-day-box .event-button-wrapper {
+  width: 100%;
+  white-space: nowrap;
 }
 
-.month-day-box .event .name {
-  /*font-weight: bold;*/
+.month-day-box:last-child,
+.month-day-box:first-child {
+  background-color: #e8e8e8;      /*light gray*/
+  color: gray;
+}
+
+.month-day-box .date-number {
+  font-weight: 400;
+}
+
+.month-day-box .name {
   font-size: 1.2em;
+  margin-left: 5px;
 }
 
-.month-day-box .event{
+.month-day-box button.event{
   font-size: 0.6em;
   margin: 2px 1px;
   padding: 3px 4px;
@@ -95,6 +140,7 @@ padding: 5px;
   border-radius: 3px;
   width: 98%;
   text-align: left;
+  overflow-x: auto;
 }
 .month-day-box button.event:focus{
   outline:none;
@@ -105,6 +151,7 @@ padding: 5px;
   cursor: pointer;
 }
 
+/*Event View componant-----------------------------------------------------*/
 .modal {
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
@@ -151,7 +198,7 @@ padding: 5px;
     color: #aaa;
     float: right;
     font-size: 28px;
-    font-weight: bold;
+    font-weight: 400;
 }
 
 .event-view-close:hover,

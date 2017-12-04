@@ -18,7 +18,7 @@ class App extends Component {
   }
 
   componentDidMount(){
-    fetch("http://nunes.online/api/gtc")
+    fetch("https://nunes.online/api/gtc")
       .then(response => response.json())
       .then(events => events.map(event=>({...event, time: new Date(event.time)})))
       .then(allEvents => this.setState({allEvents}))
@@ -52,12 +52,11 @@ class App extends Component {
 
     return (
       <div className="app">
-        {banner}
         <DisplayMonth
           monthName={getMonthName(new Date(year, month, day))}
           year={year}
           changeMonth={this.changeMonth}/>
-        <Calendar calendarHeader = {calendarHeader}
+        <Calendar
           dateMatrix = {dateMatrix}
           events = {events}
           viewEvent = {this.viewEvent}/>
@@ -83,25 +82,6 @@ const getMonthDates = (year = new Date().getFullYear(), month = new Date().getMo
   return dateMatrix
 }
 
-
-const banner = (
-  <header className="container">
-    <p className="logo">GTC:</p>
-    <p className="tagline">Greenville Tech Calendar</p>
-  </header>
-)
-
-const calendarHeader = (
-    <tr className="cal-header">
-      <td>Sunday</td>
-      <td>Monday</td>
-      <td>Tuesday</td>
-      <td>Wednesday</td>
-      <td>Thursday</td>
-      <td>Friday</td>
-      <td>Saturday</td>
-    </tr>
-)
 
 class EventView extends Component {
   constructor(props){
@@ -141,8 +121,7 @@ ${eventAddress}
 ${eventCity}, ${eventState} ${eventZip}`
     }
 
-
-    console.log(this.state.eventDetails)
+    //console.log(this.state.eventDetails)
     return(
       <div className="modal">
         <div className="event-view">
@@ -183,12 +162,24 @@ class DisplayMonth extends Component {
   }
 
   render() {
-    return (
-      <div className="date-controls container">
-        <button onClick={this.updateState} value="backwards">previous</button>
-        <div className="display-month">{this.state.monthName}, {this.state.year}</div>
-        <button onClick={this.updateState} value="forwards">next</button>
+    const logo = (
+      <div className="logo-wrapper">
+        <p className="logo">Greenville</p>
+        <p className="logo">Technology</p>
+        <p className="logo">Calendar</p>
       </div>
+    )
+
+    return (
+      <header className="header-wrapper">
+        {logo}
+        <div className="month-wrapper">
+          <button className="change-month-btn left" onClick={this.updateState} value="backwards">&lt;</button>
+          <div className="display-month">{this.state.monthName}</div>
+          <button className="change-month-btn right" onClick={this.updateState} value="forwards">&gt;</button>
+        </div>
+        <div className="display-year">{this.state.year}</div>
+      </header>
     )
   }
 }
@@ -199,7 +190,6 @@ class Calendar extends Component {
     this.state = {
       dateMatrix: props.dateMatrix,
       events: props.events,
-      calendarHeader: props.calendarHeader,
       viewEvent: props.viewEvent
     }
   }
@@ -210,10 +200,21 @@ class Calendar extends Component {
 
   render(){
     //console.log(this.state.events)
+    const calendarHeader = (
+        <tr className="cal-header">
+          <td>Sunday</td>
+          <td>Monday</td>
+          <td>Tuesday</td>
+          <td>Wednesday</td>
+          <td>Thursday</td>
+          <td>Friday</td>
+          <td>Saturday</td>
+        </tr>
+    )
     return (
       <table className="calendar">
         <tbody>
-          {this.state.calendarHeader}
+          {calendarHeader}
           <MonthWeek weekDates={this.state.dateMatrix[0]} events={this.state.events} viewEvent={this.state.viewEvent}/>
           <MonthWeek weekDates={this.state.dateMatrix[1]} events={this.state.events} viewEvent={this.state.viewEvent}/>
           <MonthWeek weekDates={this.state.dateMatrix[2]} events={this.state.events} viewEvent={this.state.viewEvent}/>
@@ -289,13 +290,15 @@ class MonthDay extends Component {
     const todaysEvents = this.getTodaysEvents(this.state.events, this.state.date) || []
     return (
       <td className="month-day-box">
-        <div>{this.props.date.getDate()}</div>
+        <div className="date-number">{this.props.date.getDate()}</div>
         <div className="inner-box">
           {todaysEvents.map((event, index)=>(
-            <button className="event" key={index} onClick={this.viewEvent.bind(this, event)}>
-              {this.displayTime(event.time)}
-              <span className="name"> {event.group_name}</span>
-            </button>
+            <div className="event-button-wrapper">
+              <button className="event" key={index} onClick={this.viewEvent.bind(this, event)}>
+                {this.displayTime(event.time)}
+                <span className="name"> {event.group_name}</span>
+              </button>
+            </div>
           ))}
         </div>
       </td>
