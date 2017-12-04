@@ -87,6 +87,7 @@ header .month-wrapper .change-month-btn {
   width:100%;
   height: 89%;
   border-collapse: collapse;
+  table-layout: fixed;
 
 }
 
@@ -134,13 +135,15 @@ padding: 5px;
 .month-day-box button.event{
   font-size: 0.6em;
   margin: 2px 1px;
-  padding: 3px 4px;
+  padding: 5px 6px;
   background-color: #009688;
   color: white;
-  border-radius: 3px;
+  border-radius: 10px;
   width: 98%;
   text-align: left;
-  overflow-x: auto;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  font-weight: 300;
 }
 .month-day-box button.event:focus{
   outline:none;
