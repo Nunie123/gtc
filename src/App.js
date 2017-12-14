@@ -140,15 +140,11 @@ ${eventCity}, ${eventState} ${eventZip}`
         <div className="event-view">
           <span className="event-view-close" onClick={this.hideEvent}>&times;</span>
           <div className="event-name detail">{eventName}</div>
-          <div className="group-name detail container"><div className="label">Hosted by: </div>{groupName}</div>
-          <div className="event-date detail container"><div className="label">Hapening on: </div>{eventDate} at {eventTime}</div>
-          <div className="venue detail container">
-            <div className="label">Located at: </div>
-
-            <div>{venue}</div>
-          </div>
-          <div className="description detail container"><div className="label">Description: </div><div>{eventDescription}</div></div>
-          <div className="event-url detail container"><div className="label">More info at: </div><a href={eventUrl}>{eventUrl}</a></div>
+          <div className="detail container"><div className="label">Time</div><div className="event-date">{eventDate} at {eventTime}</div></div>
+          <div className="detail container"><div className="label">Group</div><div className="group-name">{groupName}</div></div>
+          <div className="detail container"><div className="label">Location</div><div className="venue">{venue}</div></div>
+          <div className="detail container"><div className="label">Description</div><div className="description">{eventDescription}</div></div>
+          <div className="detail container"><div className="label">Link</div><div className="event-url"><a href={eventUrl}>{eventUrl}</a></div></div>
         </div>
       </div>
     )

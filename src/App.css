@@ -192,13 +192,19 @@ padding: 5px;
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+.modal .container {
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+
 .event-view{
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 15px;
   border: 1px solid #888;
-  width: 80%;
-  border-radius: 3px;
+  width: 50%;
+  height: 50%;
+  border-radius: 10px;
   color: #232323;
 }
 
@@ -207,19 +213,26 @@ padding: 5px;
 }
 
 .event-view .label{
-  color: gray;
-  flex: 0 0 105px;
-  display: inline-block;
-  margin-left: 10px;
+  color: inherit;
+  padding-right: 10px;
+  justify-self: end;
+  align-self: center;
+  font-size: 1.2em;
 }
 
 .event-view .event-name{
   font-size: 2em;
+  font-weight: 400;
 }
 
 .event-view .description,
 .event-view .venue {
   white-space: pre-wrap;
+}
+
+.event-view .description {
+  height: 40%;
+  overflow: auto;
 }
 
 .event-view-close {
